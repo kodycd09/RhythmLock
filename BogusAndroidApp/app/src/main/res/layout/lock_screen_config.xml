@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:name="LockScreen"><![CDATA[
+ />
+
+    ]]>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
+
+    <Button
+        android:id="@+id/setRhythm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set Rhythm" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
+
+    <Button
+        android:id="@+id/confirmRhythm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CONFIRM RHYTHM" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="   YOUR NEW BACKUP PIN" />
+
+    <Button
+        android:id="@+id/setBackupPin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SET BACKUP PIN" />
+
+    <CheckBox
+        android:id="@+id/enableService"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable Service" />
+
+    <CheckBox
+        android:id="@+id/buzzTempo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buzz Tempo During Unlock" />
+
+    <CheckBox
+        android:id="@+id/useLockPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Use Lockscreen Picture" />
+</LinearLayout>
