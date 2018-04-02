@@ -5,6 +5,7 @@
     android:name="LockScreenConfig">
 
     <TextView
+        android:id="@+id/textSet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
@@ -13,9 +14,10 @@
         android:id="@+id/setRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Set Rhythm" />
+        android:text="Tap to Set Rhythm" />
 
     <TextView
+        android:id="@+id/textConfirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
@@ -24,18 +26,13 @@
         android:id="@+id/confirmRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CONFIRM RHYTHM" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="   YOUR NEW BACKUP PIN" />
+        android:text="Tap to CONFIRM RHYTHM" />
 
     <Button
-        android:id="@+id/setBackupPin"
+        android:id="@+id/clearRhythms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SET BACKUP PIN" />
+        android:text="Clear new rhythm" />
 
     <CheckBox
         android:id="@+id/enableService"
