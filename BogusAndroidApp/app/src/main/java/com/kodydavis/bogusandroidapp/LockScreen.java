@@ -26,7 +26,6 @@ public class LockScreen extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button lockScreenButton = (Button) findViewById(R.id.lockScreenButton);
-
         lockScreenButton.setOnClickListener(new View.OnClickListener(){
             int rhythmCounter = 0;
             @Override

@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/appicon"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
@@ -19,16 +19,22 @@
         <!-- Listens to service for Screen_On and Reboot_Complete -->
         <receiver
             android:enabled="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
             android:name=".LockScreenReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
             </intent-filter>
         </receiver>
 
-        <!-- runs main activity -->
-        <activity android:name=".LockScreen">
+        <!-- runs activities -->
+        <activity android:name=".LockScreen" android:label="RhythmLock">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".LockScreenConfig"
+                    android:label="RhythmLock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
