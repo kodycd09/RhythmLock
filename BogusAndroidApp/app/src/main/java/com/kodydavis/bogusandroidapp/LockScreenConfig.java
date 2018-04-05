@@ -1,5 +1,6 @@
 package com.kodydavis.bogusandroidapp;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -26,6 +27,9 @@ public class LockScreenConfig extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final SharedPreferences prefs = this.getSharedPreferences(
+                "com.kodydavis.bogusandroidapp", Context.MODE_PRIVATE);
+
         startService(new Intent(this,LockScreenService.class));
         setContentView(R.layout.lock_screen_config);
 
@@ -36,8 +40,6 @@ public class LockScreenConfig extends AppCompatActivity {
 
         final TextView textConfirm = (TextView) findViewById(R.id.textConfirm);
         Button setConfirmButton = (Button) findViewById(R.id.confirmRhythm);
-
-        final Button clearCurRhythmsButton = (Button) findViewById(R.id.clearRhythms);
 
         setRhythmButton.setOnClickListener(new View.OnClickListener(){
             long lastTap = 0;
@@ -122,25 +124,12 @@ public class LockScreenConfig extends AppCompatActivity {
                             if (newPassword.equals(confirmPassword)) {
                                 textSet.setText("Password Confirmed");
                                 setActivePassword(newPassword);
+                                prefs.edit().putString("activePassword",activePassword.toString());
                                 clearPasswords();
-
-                                Context context = getApplicationContext();
-                                CharSequence text = "SUCCESS!";
-                                int duration = Toast.LENGTH_LONG;
-
-//                                Toast toast = Toast.makeText(context, text, duration);
-//                                toast.show();
                             }
                             else {
                                 curConfirmPassword.clear();
                                 textConfirm.setText("Retry: Password does not match");
-
-                                Context context = getApplicationContext();
-                                CharSequence text = "Passwords do not match!";
-                                int duration = Toast.LENGTH_LONG;
-
-//                                Toast toast = Toast.makeText(context, text, duration);
-//                                toast.show();
                             }
                         }
                     }, 10000); //10000 is 10s
@@ -173,17 +162,6 @@ public class LockScreenConfig extends AppCompatActivity {
                     Log.d("setPassword","Want to add " + zerosToAdd + " zeros");
                     //
                     curNum = 1;
-                }
-            }
-        });
-
-        clearCurRhythmsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!newPassword.isEmpty() || !confirmPassword.isEmpty()) {
-                    clearPasswords();
-                    textSet.setText("");
-                    textConfirm.setText("");
                 }
             }
         });

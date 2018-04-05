@@ -3,6 +3,7 @@ package com.kodydavis.bogusandroidapp;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -13,29 +14,116 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 public class LockScreen extends AppCompatActivity {
 
-    final int correctRhythm = 9; //Darth Vader's Theme
+    private String correctRhythm = "9"; //Darth Vader's Theme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final SharedPreferences prefs = this.getSharedPreferences(
+                "com.kodydavis.bogusandroidapp", Context.MODE_PRIVATE);
+
         makeFullScreen();
         startService(new Intent(this,LockScreenService.class));
         setContentView(R.layout.activity_main);
 
-        Button lockScreenButton = (Button) findViewById(R.id.lockScreenButton);
+        String activePassword = prefs.getString("activePassword",null);
+        Log.d("lockScreen","activePassword = " + activePassword);
+        Log.d("lockScreen", "correctRhythm = " + correctRhythm);
+
+        if (activePassword != null){
+            correctRhythm = activePassword;
+            Log.d("lockScreen", "correctRhythm changed to " + correctRhythm);
+        }
+
+        final Button lockScreenButton = (Button) findViewById(R.id.lockScreenButton);
         lockScreenButton.setOnClickListener(new View.OnClickListener(){
-            int rhythmCounter = 0;
+            long lastTap = 0;
+            int curNum = 0;
+            List<Integer> enteredPassword = new ArrayList<Integer>();
+            boolean firstTap = true;
+
             @Override
-            public void onClick(View v) {
-                rhythmCounter++;
-                if (rhythmCounter == correctRhythm) {
-                    unlockScreen(v);
+            public void onClick(final View v) {
+                if (firstTap) {
+                    firstTap = false;
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            // this code will be executed after 30 seconds
+                            Log.d("attemptPassword", "Adding last curNum = " + curNum);
+                            enteredPassword.add(curNum);
+                            Log.d("attemptPassword", "Password is " + enteredPassword.toString());
+                            if((clipPassword(enteredPassword)).toString() == prefs.getString("activePassword",null) || prefs.getString("activePassword",null) == null) {
+                                unlockScreen(v.getRootView());
+                            } else {
+                                String curPassword = prefs.getString("activePassword", null);
+                                //lockScreenButton.setText("Incorrect. Try Again");
+                                lockScreenButton.setText("Correct Answer is: " + curPassword);
+                            }
+                            firstTap = true;
+                            enteredPassword.clear();
+                            lastTap = 0;
+                        }
+                    }, 10000); //10000 is 10s
+                }
+
+                long halfSecond = MILLISECONDS.convert(320,MILLISECONDS); //500 is half second... feels too long
+
+                if (lastTap == 0) { // first tap
+                    lastTap = currentTime();
+                    Log.d("attemptPassword", "first tap at " + lastTap);
+                    curNum = 1;
+                }
+                else if (Math.abs(currentTime() - lastTap) < halfSecond) {
+                    Log.d("attemptPassword", "curNum = " + curNum);
+                    long diff = lastTap - currentTime();
+                    Log.d("attemptPassword", "diff = " + diff);
+                    Log.d("attemptPassword", "halfSecond = " + halfSecond);
+                    lastTap = currentTime();
+                    curNum++;
+                }
+                else {
+                    Log.d("attemptPassword", "Adding curNum = " + curNum);
+                    long diff = lastTap - currentTime();
+                    lastTap = currentTime();
+                    enteredPassword.add(curNum);
+                    // Add zeros for each second not tapped
+                    int zerosToAdd = (int)(Math.abs(lastTap - currentTime()))/1000;
+                    Log.d("attemptPassword", "diff = " + diff);
+                    Log.d("attemptPassword", "halfSecond = " + halfSecond);
+                    Log.d("attemptPassword","Want to add " + zerosToAdd + " zeros");
+                    //
+                    curNum = 1;
                 }
             }
         });
+    }
+
+    private long currentTime() {
+        return Calendar.getInstance().getTime().getTime();
+    }
+
+    private List<Integer> clipPassword(List<Integer> password) {
+        for (int i = 0; i < password.size() - 1; i++) {
+            if (password.get(password.size() - 1) == 0) {
+                password.remove(password.size() - 1); // Clip trailing zeros
+            }
+            else {
+                break;
+            }
+        }
+        return password;
     }
 
     /**
@@ -95,7 +183,6 @@ public class LockScreen extends AppCompatActivity {
         //Instead of using finish(), this totally destroys the process
         Log.d("unlock","killing Process " + android.os.Process.myPid());
         //android.os.Process.killProcess(android.os.Process.myPid());
-
         finish();
 
         Intent startMain = new Intent(Intent.ACTION_MAIN);

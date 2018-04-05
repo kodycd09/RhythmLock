@@ -14,7 +14,7 @@
         android:id="@+id/setRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to Set Rhythm" />
+        android:text="Tap to Set New Rhythm" />
 
     <TextView
         android:id="@+id/textConfirm"
@@ -27,12 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Tap to CONFIRM RHYTHM" />
-
-    <Button
-        android:id="@+id/clearRhythms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Clear new rhythm" />
 
     <CheckBox
         android:id="@+id/enableService"
