@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,7 +23,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class LockScreen extends AppCompatActivity {
 
-    private String correctRhythm = "9"; //Darth Vader's Theme
+    private String correctRhythm = "1"; //Darth Vader's Theme
+    final long halfSecond = MILLISECONDS.convert(320, MILLISECONDS); //500 is half second... feels too long
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,38 +46,38 @@ public class LockScreen extends AppCompatActivity {
             Log.d("lockScreen", "correctRhythm changed to " + correctRhythm);
         }
 
-        final Button lockScreenButton = (Button) findViewById(R.id.lockScreenButton);
+        final Button lockScreenButton = findViewById(R.id.lockScreenButton);
         lockScreenButton.setOnClickListener(new View.OnClickListener(){
             long lastTap = 0;
             int curNum = 0;
-            List<Integer> enteredPassword = new ArrayList<Integer>();
-            boolean firstTap = true;
+            List<Integer> enteredPassword = new ArrayList<>();
 
             @Override
             public void onClick(final View v) {
-                if (firstTap) {
-                    firstTap = false;
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            // this code will be executed after 30 seconds
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if((Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
                             Log.d("attemptPassword", "Adding last curNum = " + curNum);
                             enteredPassword.add(curNum);
                             Log.d("attemptPassword", "Password is " + enteredPassword.toString());
-                            if((clipPassword(enteredPassword)).toString() == prefs.getString("activePassword",null) || prefs.getString("activePassword",null) == null) {
+                            if ((clipPassword(enteredPassword)).toString().equals(prefs.getString("activePassword", null)) || prefs.getString("activePassword", null) == null || (clipPassword(enteredPassword)).toString().equals(correctRhythm)) {
                                 unlockScreen(v.getRootView());
                             } else {
-                                String curPassword = prefs.getString("activePassword", null);
-                                //lockScreenButton.setText("Incorrect. Try Again");
-                                lockScreenButton.setText("Correct Answer is: " + curPassword);
+                                new Timer().schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                    lockScreenButton.setText(getString(R.string.wrong_password));
+                                    //lockScreenButton.setText("Correct Answer is: " + curPassword);
+                                    }
+                                }, halfSecond * 10);
+
                             }
-                            firstTap = true;
                             enteredPassword.clear();
                             lastTap = 0;
                         }
-                    }, 10000); //10000 is 10s
-                }
-
+                    }
+                }, halfSecond * 4); //10000 is 10s
                 long halfSecond = MILLISECONDS.convert(320,MILLISECONDS); //500 is half second... feels too long
 
                 if (lastTap == 0) { // first tap
@@ -133,19 +133,13 @@ public class LockScreen extends AppCompatActivity {
     public void makeFullScreen() {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        } else {
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        }
+        this.getWindow().getDecorView()
+                .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
     }
 
     @Override
     public void onBackPressed() {
         Log.d("Buttons", ": Back button has been clicked");
-        return; //Do nothing!
     }
 
     @Override
@@ -171,6 +165,7 @@ public class LockScreen extends AppCompatActivity {
         @Override
         public void run() {
             ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+            assert am != null;
             ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
 
             if (cn != null && cn.getClassName().equals("com.android.systemui.recent.RecentsActivity")) {

@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,9 +18,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class LockScreenConfig extends AppCompatActivity {
 
-    List<Integer> activePassword = new ArrayList<Integer>();
-    List<Integer> newPassword = new ArrayList<Integer>();
-    List<Integer> confirmPassword =new ArrayList<Integer>();
+    List<Integer> activePassword = new ArrayList<>();
+    List<Integer> newPassword = new ArrayList<>();
+    List<Integer> confirmPassword =new ArrayList<>();
+    final long halfSecond = MILLISECONDS.convert(320, MILLISECONDS); //500 is half second... feels too long
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,48 +33,53 @@ public class LockScreenConfig extends AppCompatActivity {
         startService(new Intent(this,LockScreenService.class));
         setContentView(R.layout.lock_screen_config);
 
-        activePassword.add(9); //Darth Vader's Theme
+        final TextView textSet = findViewById(R.id.textSet);
+        Button setRhythmButton = findViewById(R.id.setRhythm);
 
-        final TextView textSet = (TextView) findViewById(R.id.textSet);
-        Button setRhythmButton = (Button) findViewById(R.id.setRhythm);
-
-        final TextView textConfirm = (TextView) findViewById(R.id.textConfirm);
-        Button setConfirmButton = (Button) findViewById(R.id.confirmRhythm);
+        final TextView textConfirm = findViewById(R.id.textConfirm);
+        Button setConfirmButton = findViewById(R.id.confirmRhythm);
 
         setRhythmButton.setOnClickListener(new View.OnClickListener(){
             long lastTap = 0;
             int curNum = 0;
-            List<Integer> curNewPassword = new ArrayList<Integer>();
-            boolean firstTap = true;
+            List<Integer> curNewPassword = new ArrayList<>();
+            boolean passwordIsSet = false;
 
             @Override
             public void onClick(View v) {
-                if (firstTap) {
-                    firstTap = false;
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            // this code will be executed after 30 seconds
-                            Log.d("setPassword", "Adding last curNum = " + curNum);
-                            curNewPassword.add(curNum);
-                            Log.d("setPassword", "Password is " + curNewPassword.toString());
-                            setNewPassword(clipPassword(curNewPassword));
-                            textSet.setText(curNewPassword.toString());
-                            firstTap = true;
-                            curNewPassword.clear();
-                            lastTap = 0;
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                    if(!passwordIsSet && (Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
+                        Log.d("setPassword", "Adding last curNum = " + curNum);
+                        curNewPassword.add(curNum);
+
+                        Log.d("setPassword", "Password is " + curNewPassword.toString());
+                        setNewPassword(clipPassword(curNewPassword));
+                        passwordIsSet = true;
+
+                        textSet.setText(curNewPassword.toString());
+                        curNewPassword.clear();
+                        lastTap = 0;
+
+                        if (passwordIsSet) { //give delay before allowing password to be set
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    passwordIsSet = false;
+                                }
+                            }, halfSecond * 10);
                         }
-                    }, 10000); //10000 is 10s
-                }
+                    }
+                    }
+                }, halfSecond * 4); //320 * 5 = 1600 is 1.6s
 
-                long halfSecond = MILLISECONDS.convert(320,MILLISECONDS); //500 is half second... feels too long
-
-                if (lastTap == 0) { // first tap
+                if (lastTap == 0) { // first tap - creates first number
                     lastTap = currentTime();
                     Log.d("setPassword", "first tap at " + lastTap);
                     curNum = 1;
                 }
-                else if (Math.abs(currentTime() - lastTap) < halfSecond) {
+                else if (Math.abs(currentTime() - lastTap) < halfSecond) { //end of previous number, create new number
                     Log.d("setPassword", "curNum = " + curNum);
                     long diff = lastTap - currentTime();
                     Log.d("setPassword", "diff = " + diff);
@@ -101,65 +106,70 @@ public class LockScreenConfig extends AppCompatActivity {
         setConfirmButton.setOnClickListener(new View.OnClickListener() {
             long lastTap = 0;
             int curNum = 0;
-            List<Integer> curConfirmPassword = new ArrayList<Integer>();
-            boolean firstTap = true;
+            List<Integer> curConfirmPassword = new ArrayList<>();
+            boolean passwordIsSet = false;
 
             @Override
             public void onClick(View v) {
-                if (firstTap) {
-                    firstTap = false;
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            // this code will be executed after 30 seconds
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(!passwordIsSet && (Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
                             Log.d("setPassword", "Adding last curNum = " + curNum);
                             curConfirmPassword.add(curNum);
                             Log.d("setPassword", "Password is " + curConfirmPassword.toString());
                             setConfirmPassword(clipPassword(curConfirmPassword));
                             textConfirm.setText(curConfirmPassword.toString());
-                            firstTap = true;
+                            passwordIsSet = true;
                             curConfirmPassword.clear();
                             lastTap = 0;
 
                             if (newPassword.equals(confirmPassword)) {
-                                textSet.setText("Password Confirmed");
+                                textSet.setText(getString(R.string.password_confirmed));
                                 setActivePassword(newPassword);
-                                prefs.edit().putString("activePassword",activePassword.toString());
+                                prefs.edit().putString("activePassword", activePassword.toString()).apply();
                                 clearPasswords();
-                            }
-                            else {
+                            } else {
                                 curConfirmPassword.clear();
-                                textConfirm.setText("Retry: Password does not match");
+                                textConfirm.setText(getString(R.string.wrong_password));
+                            }
+
+                            if (passwordIsSet) { //give delay before allowing password to be set
+                                new Timer().schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        passwordIsSet = false;
+                                    }
+                                }, halfSecond * 10);
                             }
                         }
-                    }, 10000); //10000 is 10s
-                }
+                    }
+                }, halfSecond * 4); //10000 is 10s
+//                }
 
-                long halfSecond = MILLISECONDS.convert(320,MILLISECONDS); //500 is half second... feels too long
+                long halfSecond = MILLISECONDS.convert(320, MILLISECONDS); //500 is half second... feels too long
 
                 if (lastTap == 0) { // first tap
                     lastTap = currentTime();
                     Log.d("setPassword", "first tap at " + lastTap);
                     curNum = 1;
-                }
-                else if (Math.abs(currentTime() - lastTap) < halfSecond) {
+                } else if (Math.abs(currentTime() - lastTap) < halfSecond) {
                     Log.d("setPassword", "curNum = " + curNum);
                     long diff = lastTap - currentTime();
                     Log.d("setPassword", "diff = " + diff);
                     Log.d("setPassword", "halfSecond = " + halfSecond);
                     lastTap = currentTime();
                     curNum++;
-                }
-                else {
+                } else {
                     Log.d("setPassword", "Adding curNum = " + curNum);
                     long diff = lastTap - currentTime();
                     lastTap = currentTime();
                     curConfirmPassword.add(curNum);
                     // Add zeros for each second not tapped
-                    int zerosToAdd = (int)(Math.abs(lastTap - currentTime()))/1000;
+                    int zerosToAdd = (int) (Math.abs(lastTap - currentTime())) / 1000;
                     Log.d("setPassword", "diff = " + diff);
                     Log.d("setPassword", "halfSecond = " + halfSecond);
-                    Log.d("setPassword","Want to add " + zerosToAdd + " zeros");
+                    Log.d("setPassword", "Want to add " + zerosToAdd + " zeros");
                     //
                     curNum = 1;
                 }

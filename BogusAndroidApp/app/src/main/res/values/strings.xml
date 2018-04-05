@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">BogusAndroidApp</string>
+    <string name="app_name">RhythmLock</string>
+    <string name="wrong_password">Incorrect. Try Again</string>
+    <string name="password_confirmed">Password Confirmed</string>
 </resources>
