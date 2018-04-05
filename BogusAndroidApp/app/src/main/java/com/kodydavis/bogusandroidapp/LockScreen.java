@@ -95,6 +95,12 @@ public class LockScreen extends AppCompatActivity {
         //Instead of using finish(), this totally destroys the process
         Log.d("unlock","killing Process " + android.os.Process.myPid());
         //android.os.Process.killProcess(android.os.Process.myPid());
+
         finish();
+
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }

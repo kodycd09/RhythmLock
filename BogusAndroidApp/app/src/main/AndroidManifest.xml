@@ -31,6 +31,7 @@
         <activity android:name=".LockScreen" android:label="RhythmLock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".LockScreenConfig" android:label="RhythmLock">

@@ -1,11 +1,16 @@
 package com.kodydavis.bogusandroidapp;
 
+import android.app.AlarmManager;
 import android.app.KeyguardManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.util.Log;
 
 public class LockScreenService extends Service {
 
@@ -28,15 +33,30 @@ public class LockScreenService extends Service {
         key.disableKeyguard();
 
         //Start listening for the Screen On, Screen Off, and Boot completed actions
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        //filter.addAction(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_BOOT_COMPLETED);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        //filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction("com.android.ServiceStopped");
 
         //Set up a receiver to listen for the Intents in this Service
         receiver = new LockScreenReceiver();
         registerReceiver(receiver, filter);
 
         super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("LocalService", "Received start id " + startId + ": " + intent);
+        // We want this service to continue running until it is explicitly
+        // stopped, so return sticky.
+        return START_STICKY;
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent){
+        Intent intent = new Intent("com.android.ServiceStopped");
+        sendBroadcast(intent);
     }
 
     @Override
