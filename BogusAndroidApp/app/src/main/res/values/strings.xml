@@ -3,4 +3,10 @@
     <string name="enter_password">Tap Anywhere</string>
     <string name="wrong_password">Incorrect. Try Again</string>
     <string name="password_confirmed">Password Confirmed</string>
+    <string name="set_placeholder">   VISUAL REPRESENTATION OF YOUR RHYTHM</string>
+    <string name="tap_to_set">Tap to Set New Rhythm</string>
+    <string name="tap_to_confirm">Tap to CONFIRM RHYTHM</string>
+    <string name="enable_service">Enable Service</string>
+    <string name="buzz_tempo">Buzz Tempo During Unlock</string>
+    <string name="use_picture">Use Lockscreen Picture</string>
 </resources>

@@ -8,45 +8,45 @@
         android:id="@+id/textSet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
+        android:text="@string/set_placeholder" />
 
     <Button
         android:id="@+id/setRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to Set New Rhythm" />
+        android:text="" />
 
     <TextView
         android:id="@+id/textConfirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM"
+        android:text="@string/set_placeholder"
         android:visibility="invisible" />
 
     <Button
         android:id="@+id/confirmRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to CONFIRM RHYTHM"
+        android:text="@string/tap_to_confirm"
         android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/enableService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable Service"
+        android:text="@string/enable_service"
         android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/buzzTempo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Buzz Tempo During Unlock" />
+        android:text="@string/buzz_tempo" />
 
     <CheckBox
         android:id="@+id/useLockPicture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Use Lockscreen Picture"
+        android:text="@string/use_picture"
         android:visibility="invisible" />
 </LinearLayout>
