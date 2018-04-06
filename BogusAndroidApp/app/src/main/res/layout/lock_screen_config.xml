@@ -20,19 +20,22 @@
         android:id="@+id/textConfirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM" />
+        android:text="   VISUAL REPRESENTATION OF YOUR RHYTHM"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/confirmRhythm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to CONFIRM RHYTHM" />
+        android:text="Tap to CONFIRM RHYTHM"
+        android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/enableService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enable Service" />
+        android:text="Enable Service"
+        android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/buzzTempo"
@@ -44,5 +47,6 @@
         android:id="@+id/useLockPicture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Use Lockscreen Picture" />
+        android:text="Use Lockscreen Picture"
+        android:visibility="invisible" />
 </LinearLayout>

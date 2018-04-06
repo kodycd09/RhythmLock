@@ -54,6 +54,12 @@ public class LockScreen extends AppCompatActivity {
 
             @Override
             public void onClick(final View v) {
+                lockScreenButton.postDelayed(new Runnable() {
+                    public void run()
+                    {
+                        lockScreenButton.setText(getString(R.string.enter_password));
+                    }
+                },0);
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -68,11 +74,11 @@ public class LockScreen extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         lockScreenButton.postDelayed(new Runnable() {
-                                        public void run()
-                                        {
-                                            lockScreenButton.setText(getString(R.string.wrong_password));
-                                        }
-                                    },0);
+                                            public void run()
+                                            {
+                                                lockScreenButton.setText(getString(R.string.wrong_password));
+                                            }
+                                        },0);
                                     //lockScreenButton.setText("Correct Answer is: " + curPassword);
                                     }
                                 }, halfSecond * 10);

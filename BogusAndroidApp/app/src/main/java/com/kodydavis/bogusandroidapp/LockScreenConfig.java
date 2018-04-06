@@ -1,6 +1,7 @@
 package com.kodydavis.bogusandroidapp;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -14,6 +15,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.graphics.Color.rgb;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class LockScreenConfig extends AppCompatActivity {
@@ -37,44 +40,38 @@ public class LockScreenConfig extends AppCompatActivity {
         Button setRhythmButton = findViewById(R.id.setRhythm);
 
         final TextView textConfirm = findViewById(R.id.textConfirm);
-        Button setConfirmButton = findViewById(R.id.confirmRhythm);
+        final Button setConfirmButton = findViewById(R.id.confirmRhythm);
 
         setRhythmButton.setOnClickListener(new View.OnClickListener(){
             long lastTap = 0;
             int curNum = 0;
             List<Integer> curNewPassword = new ArrayList<>();
-            boolean passwordIsSet = false;
-
             @Override
             public void onClick(View v) {
+                setConfirmButton.setVisibility(View.INVISIBLE);
+                textConfirm.setVisibility(View.INVISIBLE);
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                    if(!passwordIsSet && (Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
+                    if((Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
                         Log.d("setPassword", "Adding last curNum = " + curNum);
                         curNewPassword.add(curNum);
 
                         Log.d("setPassword", "Password is " + curNewPassword.toString());
                         setNewPassword(clipPassword(curNewPassword));
-                        passwordIsSet = true;
 
                         textSet.postDelayed(new Runnable() {
                             public void run()
                             {
+                                textSet.setTextColor(rgb(0,0,0));
                                 textSet.setText(curNewPassword.toString());
+                                curNewPassword.clear();
+                                textConfirm.setText("");
+                                textConfirm.setVisibility(View.VISIBLE);
+                                setConfirmButton.setVisibility(View.VISIBLE);
                             }
                         },0);
-                        curNewPassword.clear();
                         lastTap = 0;
-
-                        if (passwordIsSet) { //give delay before allowing password to be set
-                            new Timer().schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    passwordIsSet = false;
-                                }
-                            }, halfSecond * 10);
-                        }
                     }
                     }
                 }, halfSecond * 4); //320 * 5 = 1600 is 1.6s
@@ -112,14 +109,13 @@ public class LockScreenConfig extends AppCompatActivity {
             long lastTap = 0;
             int curNum = 0;
             List<Integer> curConfirmPassword = new ArrayList<>();
-            boolean passwordIsSet = false;
 
             @Override
             public void onClick(View v) {
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        if(!passwordIsSet && (Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
+                        if((Math.abs(currentTime() - lastTap) >= (halfSecond * 3.9))) {
                             Log.d("setPassword", "Adding last curNum = " + curNum);
                             curConfirmPassword.add(curNum);
                             Log.d("setPassword", "Password is " + curConfirmPassword.toString());
@@ -132,37 +128,31 @@ public class LockScreenConfig extends AppCompatActivity {
                                 }
                             },0);
 
-                            passwordIsSet = true;
-                            curConfirmPassword.clear();
-                            lastTap = 0;
-
                             if (newPassword.equals(confirmPassword)) {
                                 textSet.postDelayed(new Runnable() {
                                     public void run()
                                     {
-                                        textSet.setText(getString(R.string.password_confirmed));
+                                        textSet.setTextColor(rgb(0,200,20));
+                                        textSet.setText(getString(R.string.password_confirmed) + " " + newPassword.toString());
+                                        setConfirmButton.setVisibility(View.INVISIBLE);
+                                        textConfirm.setVisibility(View.INVISIBLE);
+                                        textConfirm.setText("");
+                                        setActivePassword(newPassword);
+                                        prefs.edit().putString("activePassword", activePassword.toString()).apply();
+                                        clearPasswords();
+                                        lastTap = 0;
                                     }
                                 },0);
-                                setActivePassword(newPassword);
-                                prefs.edit().putString("activePassword", activePassword.toString()).apply();
-                                clearPasswords();
                             } else {
-                                curConfirmPassword.clear();
                                 textSet.postDelayed(new Runnable() {
                                     public void run()
                                     {
+                                        textConfirm.setTextColor(Color.RED);
                                         textConfirm.setText(getString(R.string.wrong_password));
+                                        curConfirmPassword.clear();
+                                        lastTap = 0;
                                     }
                                 },0);
-                            }
-
-                            if (passwordIsSet) { //give delay before allowing password to be set
-                                new Timer().schedule(new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        passwordIsSet = false;
-                                    }
-                                }, halfSecond * 10);
                             }
                         }
                     }
