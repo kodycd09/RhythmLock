@@ -67,7 +67,12 @@ public class LockScreen extends AppCompatActivity {
                                 new Timer().schedule(new TimerTask() {
                                     @Override
                                     public void run() {
-                                    lockScreenButton.setText(getString(R.string.wrong_password));
+                                        lockScreenButton.postDelayed(new Runnable() {
+                                        public void run()
+                                        {
+                                            lockScreenButton.setText(getString(R.string.wrong_password));
+                                        }
+                                    },0);
                                     //lockScreenButton.setText("Correct Answer is: " + curPassword);
                                     }
                                 }, halfSecond * 10);

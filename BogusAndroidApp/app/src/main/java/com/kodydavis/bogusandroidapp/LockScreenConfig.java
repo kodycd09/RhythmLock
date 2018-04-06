@@ -58,7 +58,12 @@ public class LockScreenConfig extends AppCompatActivity {
                         setNewPassword(clipPassword(curNewPassword));
                         passwordIsSet = true;
 
-                        textSet.setText(curNewPassword.toString());
+                        textSet.postDelayed(new Runnable() {
+                            public void run()
+                            {
+                                textSet.setText(curNewPassword.toString());
+                            }
+                        },0);
                         curNewPassword.clear();
                         lastTap = 0;
 
@@ -119,19 +124,36 @@ public class LockScreenConfig extends AppCompatActivity {
                             curConfirmPassword.add(curNum);
                             Log.d("setPassword", "Password is " + curConfirmPassword.toString());
                             setConfirmPassword(clipPassword(curConfirmPassword));
-                            textConfirm.setText(curConfirmPassword.toString());
+
+                            textSet.postDelayed(new Runnable() {
+                                public void run()
+                                {
+                                    textConfirm.setText(curConfirmPassword.toString());
+                                }
+                            },0);
+
                             passwordIsSet = true;
                             curConfirmPassword.clear();
                             lastTap = 0;
 
                             if (newPassword.equals(confirmPassword)) {
-                                textSet.setText(getString(R.string.password_confirmed));
+                                textSet.postDelayed(new Runnable() {
+                                    public void run()
+                                    {
+                                        textSet.setText(getString(R.string.password_confirmed));
+                                    }
+                                },0);
                                 setActivePassword(newPassword);
                                 prefs.edit().putString("activePassword", activePassword.toString()).apply();
                                 clearPasswords();
                             } else {
                                 curConfirmPassword.clear();
-                                textConfirm.setText(getString(R.string.wrong_password));
+                                textSet.postDelayed(new Runnable() {
+                                    public void run()
+                                    {
+                                        textConfirm.setText(getString(R.string.wrong_password));
+                                    }
+                                },0);
                             }
 
                             if (passwordIsSet) { //give delay before allowing password to be set
